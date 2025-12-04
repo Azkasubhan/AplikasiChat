@@ -1,4 +1,3 @@
-// screens/ChatScreen.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { signOut } from "firebase/auth";
@@ -32,7 +31,7 @@ export default function ChatScreen({ route }) {
   const [messages, setMessages] = useState([]);
   const [isOnline, setIsOnline] = useState(true);
 
-  // Load offline messages saat app start
+  // Load Offline Message
   useEffect(() => {
     loadOfflineMessages();
   }, []);
@@ -53,24 +52,18 @@ export default function ChatScreen({ route }) {
         });
         setMessages(list);
         setIsOnline(true);
-        console.log("🟢 Connected to Firestore - Online mode");
-        // Simpan ke local storage
         saveMessagesToLocal(list);
-        
-        // Clear timeout karena berhasil connect
         clearTimeout(onlineCheckTimeout);
       },
       (err) => {
-        console.error("❌ Firestore error:", err.code || err.message);
-        console.log("🔴 Switched to Offline mode");
+        console.error("Firestore error:", err.code || err.message);
         setIsOnline(false);
       }
     );
     
-    // Set timeout untuk detect offline jika tidak ada response dalam 5 detik
+    // Set timeout untuk detect offline
     onlineCheckTimeout = setTimeout(() => {
       if (isOnline === true) {
-        console.log("⚠️ No Firestore response - might be offline");
         setIsOnline(false);
       }
     }, 5000);
@@ -86,42 +79,18 @@ export default function ChatScreen({ route }) {
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsedMessages = JSON.parse(stored);
-        console.log("✅ Loaded from offline storage:", parsedMessages.length, "messages");
         setMessages(parsedMessages);
-      } else {
-        console.log("ℹ️ No offline messages found");
       }
     } catch (e) {
-      console.error("❌ Load offline messages error", e);
+      console.error("Load offline messages error", e);
     }
   };
 
   const saveMessagesToLocal = async (msgs) => {
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(msgs));
-      console.log("💾 Saved to local storage:", msgs.length, "messages");
     } catch (e) {
-      console.error("❌ Save to local error", e);
-    }
-  };
-
-  // Debug function - untuk test manual
-  const testLocalStorage = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      const count = stored ? JSON.parse(stored).length : 0;
-      const status = isOnline ? "🟢 Online" : "🔴 Offline";
-      const lastMessage = stored ? JSON.parse(stored).slice(-1)[0] : null;
-      
-      Alert.alert(
-        "📊 Local Storage Info",
-        `Status Koneksi: ${status}\n\n` +
-        `Total Pesan Tersimpan: ${count} pesan\n\n` +
-        `Pesan Terakhir:\n${lastMessage ? (lastMessage.text || "[Gambar]") : "Belum ada pesan"}`,
-        [{ text: "OK" }]
-      );
-    } catch (e) {
-      Alert.alert("Error", "Gagal membaca local storage");
+      console.error("Save to local error", e);
     }
   };
 
@@ -142,7 +111,7 @@ export default function ChatScreen({ route }) {
   };
 
   const pickImageAndSend = async () => {
-    // permission untuk Android (web tidak butuh)
+    // permission untuk Android 
     if (Platform.OS !== "web") {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
@@ -154,7 +123,7 @@ export default function ChatScreen({ route }) {
       const res = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         base64: true,
-        quality: 0.4, // compress, agar ukuran base64 lebih kecil
+        quality: 0.4,
       });
 
       if (res.canceled) return;
@@ -221,19 +190,13 @@ export default function ChatScreen({ route }) {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Status Bar */}
       <View style={styles.statusBar}>
         <Text style={styles.statusText}>
-          {isOnline ? "🟢 Online" : "🔴 Offline (Mode Lokal)"}
+          {isOnline ? "Online" : "Offline"}
         </Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <TouchableOpacity onPress={testLocalStorage} style={styles.debugBtn}>
-            <Text style={styles.debugText}>📊</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -272,16 +235,6 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontWeight: "600",
-  },
-  debugBtn: {
-    backgroundColor: "#4CAF50",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 5,
-    marginRight: 8,
-  },
-  debugText: {
-    fontSize: 16,
   },
   logoutBtn: {
     backgroundColor: "#ff4444",

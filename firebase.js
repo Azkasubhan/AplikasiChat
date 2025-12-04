@@ -3,7 +3,6 @@ import { initializeApp } from "firebase/app";
 import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { collection, getFirestore } from "firebase/firestore";
 
-// Ganti dengan firebaseConfig Web App milikmu
 const firebaseConfig = {
   apiKey: "AIzaSyCXKdYYszIl8wphYHU5K4_lBj_o_Z12cmk",
   authDomain: "aplikasichat-6f089.firebaseapp.com",
@@ -16,14 +15,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth with AsyncStorage persistence
+// inisialisasi AsyncStorage
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 });
 
 const db = getFirestore(app);
 
-// collection default (sesuai contoh pada PDF)
 const messagesCollection = collection(db, "messages");
 
 export { app, auth, db, messagesCollection };

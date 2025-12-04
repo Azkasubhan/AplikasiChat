@@ -1,4 +1,3 @@
-// screens/LoginScreen.js
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { ActivityIndicator, Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -20,7 +19,6 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Navigation akan otomatis handle oleh auth state listener di app.js
     } catch (error) {
       console.error("Login error:", error);
       let errorMessage = "Login gagal";
